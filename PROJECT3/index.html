@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PhishGuard – Phishing Threat Analysis</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<aside id="side"><div class="brand"><span class="logo">🛡</span><div><b>PhishGuard</b><small>Threat Analysis Platform</small></div></div>
+<nav><button data-view="dash" class="on">▦ Dashboard</button><button data-view="analyze">✉ Analyze Message</button><button data-view="history">⏱ History</button><button data-view="guide">📘 Threat Guide</button><button data-view="about">ℹ About</button></nav></aside>
+<main>
+<header><h1 id="title">Dashboard</h1><span class="status"><i></i>Engine online · analysis is local</span></header>
+
+<section id="v-dash" class="view">
+ <div class="grid4"><div class="card stat"><small>Analyses</small><b id="s-total">0</b></div><div class="card stat"><small>Average score</small><b id="s-avg">0</b></div><div class="card stat"><small>Highest score</small><b id="s-max">0</b></div><div class="card stat"><small>Engine</small><b>Rules</b></div></div>
+ <div class="card"><h2>Threat distribution</h2><div id="dist"></div></div>
+ <div class="card"><h2>Quick start</h2><p class="muted">Load a sample into the analyzer:</p><div class="chips" id="ex-dash"></div></div>
+</section>
+
+<section id="v-analyze" class="view" hidden>
+ <div class="card"><h2>Message analysis</h2>
+  <textarea id="msg" aria-label="Message to analyse" maxlength="10000" placeholder="Paste a suspicious email, SMS or message here. Links are analysed as text only and never opened."></textarea>
+  <div class="row"><span class="muted"><span id="count">0</span> / 10000</span><span id="err" class="err" role="alert"></span></div>
+  <div class="row acts"><button class="btn" id="analyze">Analyse Message</button><button class="btn ghost" id="clear">Clear Input</button><span id="loader" class="loader" hidden><i></i> Analysing…</span></div>
+  <p class="muted">Example messages (fictional):</p><div class="chips" id="ex"></div></div>
+ <div id="result"></div>
+</section>
+
+<section id="v-history" class="view" hidden><div class="card"><div class="row"><h2>Analysis history</h2><button class="btn ghost" id="clear-hist">Clear history</button></div>
+ <p class="muted">Stored only in this browser (localStorage): a short preview, score and findings, never the full message.</p><div id="hist"></div></div></section>
+
+<section id="v-guide" class="view" hidden><div class="grid3">
+ <div class="card"><h3>What is phishing?</h3><p>Fraudulent messages that imitate trusted senders to steal credentials, money or data.</p></div>
+ <div class="card"><h3>Common techniques</h3><p>Fake urgency, brand impersonation, lookalike domains, shortened links, fake prizes, advance-fee requests.</p></div>
+ <div class="card"><h3>Spotting suspicious emails</h3><p>Check the sender address, generic greetings, pressure to act, spelling oddities and unexpected attachments.</p></div>
+ <div class="card"><h3>Inspecting URLs safely</h3><p>Read the domain just before the first single slash. Hover to preview links. Type known addresses yourself. Never open unknown links to "see what happens".</p></div>
+ <div class="card"><h3>Never share OTPs or passwords</h3><p>Banks and services never ask for them by message or call. An OTP approves an action on your account.</p></div>
+ <div class="card"><h3>After clicking a bad link</h3><p>Disconnect if a file downloaded, change passwords from a clean device, enable 2FA, tell your bank and IT team, watch your accounts.</p></div>
+ <div class="card"><h3>Reporting phishing</h3><p>Use your email provider's "report phishing", forward to your organisation's security team, and report to your national cyber-crime portal.</p></div>
+</div></section>
+
+<section id="v-about" class="view" hidden><div class="card"><h2>About PhishGuard</h2>
+ <p>Built as a cybersecurity internship project (DecodeLabs). The backend is a transparent <b>rule-based engine</b> in Python's standard library: phrase rules, local URL heuristics, social-engineering mapping and an explainable score. It uses no machine learning, no external APIs, and never visits submitted URLs.</p>
+ <p class="muted">Scores are heuristic assessments, not guarantees. Limitations: English-centric rules, no sender/header analysis, small brand list.</p></div></section>
+</main>
+<script src="script.js"></script></body></html>
