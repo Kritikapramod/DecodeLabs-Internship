@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Encryption &amp; Decryption | DecodeLabs Project 02</title>
+  <!-- Optional web font. If it cannot load, style.css falls back to system fonts. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <!-- Relative path: style.css must sit in the SAME folder as this file -->
+  <style>
+/* Design tokens: change colours and spacing here */
+:root {
+  --bg:#0a0f1c; --surface:#111a2e; --surface-2:#0c1426; --border:#243251; --border-strong:#33456d;
+  --text:#f1f5fb; --muted:#93a1bd; --accent:#22d3ee; --accent-soft:rgba(34,211,238,.12);
+  --ok:#4ade80; --error:#f87171;
+  --radius:12px; --radius-sm:8px; --space-1:8px; --space-2:16px; --space-3:24px; --space-4:32px;
+  --font:Inter,"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  --mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+}
+*,*::before,*::after { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { margin:0; color:var(--text); font-family:var(--font); line-height:1.6;
+       background:radial-gradient(800px 400px at 50% -100px, rgba(34,211,238,.08), transparent), var(--bg); }
+
+/* Navigation */
+.nav { display:flex; justify-content:space-between; align-items:center; gap:var(--space-2); padding:12px clamp(16px,4vw,40px);
+       border-bottom:1px solid var(--border); background:rgba(10,15,28,.9); position:sticky; top:0; z-index:10; }
+.brand, .nav-right { display:flex; align-items:center; gap:12px; }
+.brand-icon { width:22px; height:22px; fill:var(--accent); flex:none; }
+.brand-name { font-weight:700; }
+.brand-label, .nav-note { font-size:.72rem; letter-spacing:.12em; color:var(--muted); font-weight:500; }
+.brand-label { padding-left:12px; border-left:1px solid var(--border); }
+.badge { font-size:.72rem; font-weight:700; letter-spacing:.1em; color:var(--accent); background:var(--accent-soft);
+         border:1px solid rgba(34,211,238,.4); border-radius:999px; padding:3px 12px; }
+
+.container { max-width:1120px; margin:0 auto; padding:var(--space-4) var(--space-2) var(--space-3);
+             display:grid; grid-template-columns:minmax(0,1fr); gap:var(--space-4); }
+
+/* Hero */
+.hero { text-align:center; padding-top:var(--space-2); }
+.eyebrow { margin:0 0 var(--space-1); font-size:.75rem; letter-spacing:.18em; color:var(--accent); font-weight:600; }
+h1 { margin:0; font-size:clamp(1.9rem,4.5vw,2.8rem); line-height:1.15; letter-spacing:-.02em; }
+.accent-line { display:block; width:56px; height:3px; margin:14px auto; background:var(--accent); border-radius:3px; }
+.hero-text { margin:0 auto; max-width:560px; color:var(--muted); }
+
+/* Cards */
+.card { background:linear-gradient(180deg,var(--surface),#0f1830); border:1px solid var(--border); border-radius:var(--radius);
+        box-shadow:0 8px 28px rgba(0,0,0,.35); }
+.workspace { padding:clamp(18px,3vw,32px); }
+.card-header { margin-bottom:var(--space-3); padding-bottom:var(--space-2); border-bottom:1px solid var(--border); }
+.card-header p { margin:4px 0 0; color:var(--muted); }
+.section-label { margin:0; font-size:.78rem; letter-spacing:.14em; font-weight:700; color:var(--accent); }
+.workspace-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:var(--space-3); align-items:start; }
+.panel { display:grid; grid-template-columns:minmax(0,1fr); gap:var(--space-3); }
+.results { gap:var(--space-2); }
+
+/* Form controls */
+.field-label { display:block; margin-bottom:var(--space-1); font-size:.78rem; letter-spacing:.12em; font-weight:600; color:var(--muted); }
+textarea, input[type=number] { width:100%; padding:12px 14px; font:inherit; color:var(--text); background:var(--surface-2);
+        border:1px solid var(--border); border-radius:var(--radius-sm); transition:border-color .2s, box-shadow .2s; }
+textarea { min-height:150px; resize:vertical; font-family:var(--mono); font-size:.95rem; }
+textarea::placeholder { color:#5f6f91; }
+textarea:focus, input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(34,211,238,.2); }
+.invalid { border-color:var(--error) !important; }
+.field-footer { display:flex; justify-content:space-between; align-items:center; gap:var(--space-1); flex-wrap:wrap; margin-top:var(--space-1); }
+.muted { color:var(--muted); font-size:.88rem; margin:0; }
+.shift-row { display:flex; align-items:center; gap:var(--space-2); margin-bottom:var(--space-1); }
+input[type=range] { flex:1; min-width:0; accent-color:var(--accent); height:28px; cursor:pointer; }
+input[type=number] { width:84px; text-align:center; font-weight:700; font-size:1.1rem; color:var(--accent); }
+
+/* Buttons: same height and shape everywhere */
+.button-row { display:flex; gap:10px; flex-wrap:wrap; }
+.btn { font:inherit; font-weight:600; font-size:.95rem; height:44px; padding:0 20px; border-radius:var(--radius-sm); cursor:pointer;
+       border:1px solid var(--border-strong); background:transparent; color:var(--text);
+       transition:background .2s, border-color .2s, transform .1s; }
+.btn.small { height:34px; padding:0 14px; font-size:.82rem; }
+.btn:hover:not(:disabled) { border-color:var(--accent); background:var(--accent-soft); }
+.btn:active:not(:disabled) { transform:translateY(1px); }
+.btn:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.btn:disabled { opacity:.4; cursor:not-allowed; }
+.btn.primary { background:var(--accent); border-color:var(--accent); color:#03181f; }
+.btn.primary:hover:not(:disabled) { background:#67e8f9; }
+.btn.secondary { border-color:var(--accent); color:var(--accent); }
+.btn.ghost { color:var(--muted); border-color:var(--border); }
+.btn.ghost:hover:not(:disabled) { color:var(--text); }
+.actions { margin-top:-8px; }
+.status { min-height:1.5em; margin:-8px 0 0; font-weight:600; font-size:.92rem; }
+.status.success { color:var(--ok); } .status.error { color:var(--error); }
+
+/* Results */
+.result-card { background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-2);
+               min-width:0; transition:border-color .3s; }
+.result-card.done { border-color:rgba(74,222,128,.55); }
+.result-head { display:flex; justify-content:space-between; align-items:center; gap:var(--space-1); flex-wrap:wrap; margin-bottom:12px; }
+.state-group { display:flex; gap:6px; align-items:center; }
+.tag, .state { font-size:.72rem; font-weight:600; border-radius:999px; padding:2px 10px; }
+.tag { color:var(--accent); background:var(--accent-soft); } .tag:empty { display:none; }
+.state { color:var(--muted); border:1px solid var(--border); }
+.state.ok { color:var(--ok); border-color:rgba(74,222,128,.5); background:rgba(74,222,128,.1); }
+.output { min-height:96px; max-height:240px; overflow:auto; margin-bottom:12px; padding:12px; background:#080d1a; border:1px solid var(--border);
+          border-radius:var(--radius-sm); white-space:pre-wrap; overflow-wrap:anywhere; font-family:var(--mono); font-size:.95rem; }
+.output:focus-visible { outline:2px solid var(--accent); }
+.output.placeholder { color:#5f6f91; font-family:var(--font); font-size:.9rem; }
+
+/* Education */
+.learn-title { margin-bottom:var(--space-2); }
+.learn-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--space-2); }
+.learn-card { padding:var(--space-3); transition:border-color .2s, transform .2s; }
+.learn-card:hover { border-color:var(--border-strong); transform:translateY(-2px); }
+.learn-card h3 { margin:0 0 var(--space-1); font-size:.8rem; letter-spacing:.14em; color:var(--accent); }
+.learn-card p { margin:0; color:#c3cde2; font-size:.95rem; }
+.notice { margin:0; padding:12px 16px; font-size:.9rem; color:var(--muted); background:var(--surface-2);
+          border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:var(--radius-sm); }
+.notice strong { color:var(--text); }
+.footer { text-align:center; color:var(--muted); font-size:.82rem; padding:var(--space-3) var(--space-2) var(--space-4); border-top:1px solid var(--border); }
+
+/* Responsive */
+@media (max-width:960px) { .workspace-grid { grid-template-columns:minmax(0,1fr); } }
+@media (max-width:760px) { .learn-grid { grid-template-columns:minmax(0,1fr); } .nav-note, .brand-label { display:none; } }
+@media (max-width:480px) {
+  .button-row .btn:not(.small) { flex:1 1 100%; }
+  .field-footer .button-row { width:100%; } .field-footer .btn { flex:1; }
+}
+@media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+
+</style>
+</head>
+<body>
+  <!-- Safety net: shown only if style.css or script.js failed to load (styled inline so it works without CSS) -->
+  <div id="load-warning" hidden style="background:#fde68a;color:#1f2937;padding:14px 20px;font:600 15px Arial,sans-serif;text-align:center">
+    style.css or script.js did not load. Extract the whole ZIP first (right-click, Extract All), then open index.html from the extracted folder.
+  </div>
+  <script>
+    window.addEventListener("load", function () {
+      var cssLoaded = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() !== "";
+      if (!cssLoaded || typeof caesarCipher === "undefined") document.getElementById("load-warning").hidden = false;
+    });
+  </script>
+
+  <header class="nav">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"/></svg>
+      <span class="brand-name">DecodeLabs</span>
+      <span class="brand-label">CYBER SECURITY</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-note">CLASSICAL CIPHER</span>
+      <span class="badge">PROJECT 02</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <p class="eyebrow">CYBERSECURITY LAB / PROJECT 02</p>
+      <h1>Encryption &amp; Decryption</h1>
+      <span class="accent-line" aria-hidden="true"></span>
+      <p class="hero-text">Explore classical cryptography by encrypting and decrypting messages with a configurable Caesar cipher.</p>
+    </section>
+
+    <section class="card workspace" aria-labelledby="workspace-title">
+      <div class="card-header">
+        <h2 id="workspace-title" class="section-label">CIPHER WORKSPACE</h2>
+        <p>Write a message, choose a shift, then encrypt it and decrypt it again.</p>
+      </div>
+
+      <div class="workspace-grid">
+        <!-- LEFT: input and controls -->
+        <div class="panel">
+          <div class="field">
+            <label for="plaintext" class="field-label">YOUR MESSAGE</label>
+            <textarea id="plaintext" rows="6" placeholder="Enter the message you want to encrypt..."></textarea>
+            <div class="field-footer">
+              <span id="char-count" class="muted">0 characters</span>
+              <span class="button-row">
+                <button type="button" id="example-btn" class="btn ghost small">Insert Example</button>
+                <button type="button" id="clear-btn" class="btn ghost small">Clear Input</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="shift" class="field-label">CAESAR SHIFT</label>
+            <div class="shift-row">
+              <input id="shift-range" type="range" min="1" max="25" step="1" value="3" aria-label="Shift slider">
+              <input id="shift" type="number" min="1" max="25" step="1" value="3" inputmode="numeric" aria-describedby="shift-help">
+            </div>
+            <p id="shift-help" class="muted">Each letter moves this many places along the alphabet. With a shift of 3, A becomes D and Z wraps around to C.</p>
+          </div>
+
+          <div class="button-row actions">
+            <button type="button" id="encrypt-btn" class="btn primary">Encrypt Message</button>
+            <button type="button" id="decrypt-btn" class="btn secondary">Decrypt Message</button>
+            <button type="button" id="reset-btn" class="btn ghost">Reset</button>
+          </div>
+          <p id="status" class="status" role="status" aria-live="polite"></p>
+        </div>
+
+        <!-- RIGHT: results -->
+        <div class="panel results">
+          <article class="result-card" id="cipher-card">
+            <div class="result-head">
+              <h3 class="section-label">ENCRYPTED MESSAGE</h3>
+              <span class="state-group"><span id="encrypt-shift" class="tag"></span><span id="encrypt-state" class="state">Waiting</span></span>
+            </div>
+            <div id="ciphertext" class="output placeholder" tabindex="0" aria-label="Encrypted message">Your ciphertext will appear here after encryption.</div>
+            <button type="button" id="copy-cipher-btn" class="btn ghost small" disabled>Copy Ciphertext</button>
+          </article>
+
+          <article class="result-card" id="plain-card">
+            <div class="result-head">
+              <h3 class="section-label">DECRYPTED MESSAGE</h3>
+              <span class="state-group"><span id="decrypt-shift" class="tag"></span><span id="decrypt-state" class="state">Waiting</span></span>
+            </div>
+            <div id="decrypted" class="output placeholder" tabindex="0" aria-label="Decrypted message">The recovered message will appear here after decryption.</div>
+            <button type="button" id="copy-decrypted-btn" class="btn ghost small" disabled>Copy Decrypted Text</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="learn-title">
+      <h2 id="learn-title" class="section-label learn-title">HOW IT WORKS</h2>
+      <div class="learn-grid">
+        <article class="card learn-card"><h3>ENCRYPTION</h3><p>Encryption transforms readable plaintext into unreadable ciphertext using a defined algorithm and a key.</p></article>
+        <article class="card learn-card"><h3>DECRYPTION</h3><p>Decryption reverses the transformation, recovering the plaintext when the correct key is supplied.</p></article>
+        <article class="card learn-card"><h3>THE CAESAR CIPHER</h3><p>Each letter moves a set number of positions through the alphabet, wrapping from Z back to A. Other characters stay unchanged.</p></article>
+      </div>
+    </section>
+
+    <p class="notice"><strong>Educational use only.</strong> The Caesar cipher is intended for educational purposes. It is not secure enough to protect real confidential information.</p>
+  </main>
+
+  <footer class="footer">DecodeLabs · Cyber Security · Project 02</footer>
+  <script>
+// Caesar cipher demo. All logic runs in the browser; nothing is stored or sent anywhere.
+const ALPHABET_SIZE = 26;
+const MIN_SHIFT = 1;
+const MAX_SHIFT = 25;
+const EXAMPLE_TEXT = "Meet me at the library at 5 PM, and bring the notes!";
+
+/* ---------- Core cipher logic ---------- */
+
+// Shift every letter by `shift` places. Negative shifts move backwards (used for decryption).
+function caesarCipher(text, shift) {
+  // Normalise so any integer (even negative or > 26) becomes a value from 0 to 25.
+  const normalizedShift = ((shift % ALPHABET_SIZE) + ALPHABET_SIZE) % ALPHABET_SIZE;
+  let result = "";
+  for (const character of text) {
+    const code = character.charCodeAt(0);
+    if (code >= 65 && code <= 90) {            // uppercase A-Z
+      result += String.fromCharCode(((code - 65 + normalizedShift) % ALPHABET_SIZE) + 65);
+    } else if (code >= 97 && code <= 122) {    // lowercase a-z
+      result += String.fromCharCode(((code - 97 + normalizedShift) % ALPHABET_SIZE) + 97);
+    } else {
+      result += character;                     // digits, spaces, punctuation, line breaks: unchanged
+    }
+  }
+  return result;
+}
+
+function encryptText(plaintext, shift) { return caesarCipher(plaintext, shift); }
+// Decrypting is just encrypting with the opposite shift.
+function decryptText(ciphertext, shift) { return caesarCipher(ciphertext, -shift); }
+
+// Returns an error message, or "" if the shift is a whole number from 1 to 25.
+function validateShift(shift) {
+  if (!Number.isInteger(shift) || shift < MIN_SHIFT || shift > MAX_SHIFT) {
+    return `Shift must be a whole number from ${MIN_SHIFT} to ${MAX_SHIFT}.`;
+  }
+  return "";
+}
+
+/* ---------- Interface ---------- */
+
+if (typeof document !== "undefined") {
+  const $ = id => document.getElementById(id);
+  const plaintextBox = $("plaintext"), shiftInput = $("shift"), statusLine = $("status");
+  const cipherBox = $("ciphertext"), decryptedBox = $("decrypted");
+  const copyCipherBtn = $("copy-cipher-btn"), copyDecryptedBtn = $("copy-decrypted-btn");
+  let currentCiphertext = "";   // last generated ciphertext
+  let ciphertextShift = null;   // shift that was used to create it
+
+  function setStatus(message, type) {
+    statusLine.textContent = message;
+    statusLine.className = "status " + (type || "");
+  }
+
+  // Result cards show a state badge ("Waiting" / success label) and a green border when done.
+  function setCardState(box, tagId, done, label) {
+    const stateBadge = $(tagId.replace("-shift", "-state"));
+    stateBadge.textContent = label;
+    stateBadge.classList.toggle("ok", done);
+    box.closest(".result-card").classList.toggle("done", done);
+  }
+
+  function showOutput(box, text, tagId, shift, copyBtn) {
+    box.textContent = text;
+    box.classList.remove("placeholder");
+    $(tagId).textContent = "Shift: " + shift;
+    setCardState(box, tagId, true, tagId === "encrypt-shift" ? "Encrypted" : "Decrypted");
+    copyBtn.disabled = false;
+  }
+
+  function clearOutput(box, placeholder, tagId, copyBtn) {
+    box.textContent = placeholder;
+    box.classList.add("placeholder");
+    $(tagId).textContent = "";
+    setCardState(box, tagId, false, "Waiting");
+    copyBtn.disabled = true;
+  }
+
+  // Reads and validates the shift field; returns the number, or null after showing an error.
+  function readShift() {
+    const shift = Number(shiftInput.value);
+    const error = shiftInput.value.trim() === "" ? "Please enter a shift value." : validateShift(shift);
+    shiftInput.classList.toggle("invalid", error !== "");
+    if (error) { setStatus(error, "error"); return null; }
+    return shift;
+  }
+
+  function clearDecrypted() {
+    clearOutput(decryptedBox, "The recovered message will appear here after decryption.", "decrypt-shift", copyDecryptedBtn);
+  }
+
+  function handleEncrypt() {
+    if (plaintextBox.value === "") { setStatus("Please enter a message to encrypt.", "error"); plaintextBox.focus(); return; }
+    const shift = readShift();
+    if (shift === null) return;
+    currentCiphertext = encryptText(plaintextBox.value, shift);
+    ciphertextShift = shift;
+    showOutput(cipherBox, currentCiphertext, "encrypt-shift", shift, copyCipherBtn);
+    clearDecrypted();
+    setStatus("Text encrypted successfully.", "success");
+  }
+
+  function handleDecrypt() {
+    if (currentCiphertext === "") { setStatus("Encrypt some text first, then decrypt it.", "error"); return; }
+    const shift = readShift();
+    if (shift === null) return;
+    showOutput(decryptedBox, decryptText(currentCiphertext, shift), "decrypt-shift", shift, copyDecryptedBtn);
+    setStatus(shift === ciphertextShift ? "Text decrypted successfully."
+      : "Decrypted with shift " + shift + ", which differs from the encryption shift (" + ciphertextShift + "), so the result is garbled.",
+      shift === ciphertextShift ? "success" : "error");
+  }
+
+  // Copy using the Clipboard API, with an older fallback and a message if both fail.
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const temp = document.createElement("textarea");
+        temp.value = text; temp.setAttribute("readonly", "");
+        temp.style.position = "absolute"; temp.style.left = "-9999px";
+        document.body.appendChild(temp); temp.select();
+        const worked = document.execCommand("copy");
+        document.body.removeChild(temp);
+        if (!worked) throw new Error("copy failed");
+      }
+      setStatus("Copied to clipboard.", "success");
+    } catch (err) {
+      setStatus("Copy is not available here. Select the text and press Ctrl+C instead.", "error");
+    }
+  }
+
+  function resetAll() {
+    plaintextBox.value = ""; shiftInput.value = 3; $("shift-range").value = 3; shiftInput.classList.remove("invalid");
+    currentCiphertext = ""; ciphertextShift = null;
+    clearOutput(cipherBox, "Your ciphertext will appear here after encryption.", "encrypt-shift", copyCipherBtn);
+    clearDecrypted();
+    updateCounter(); setStatus("");
+  }
+
+  function updateCounter() {
+    const length = plaintextBox.value.length;
+    $("char-count").textContent = length + (length === 1 ? " character" : " characters");
+  }
+
+  plaintextBox.addEventListener("input", updateCounter);
+  $("encrypt-btn").addEventListener("click", handleEncrypt);
+  $("decrypt-btn").addEventListener("click", handleDecrypt);
+  $("reset-btn").addEventListener("click", resetAll);
+  $("clear-btn").addEventListener("click", () => { plaintextBox.value = ""; updateCounter(); setStatus(""); plaintextBox.focus(); });
+  $("example-btn").addEventListener("click", () => { plaintextBox.value = EXAMPLE_TEXT; updateCounter(); setStatus("Example inserted. Now click Encrypt Text.", "success"); });
+  copyCipherBtn.addEventListener("click", () => copyText(currentCiphertext));
+  copyDecryptedBtn.addEventListener("click", () => copyText(decryptedBox.textContent));
+
+  // "Try another shift": changing the key re-encrypts the existing text automatically.
+  // Slider and number box stay in sync.
+  $("shift-range").addEventListener("input", () => { shiftInput.value = $("shift-range").value; shiftInput.dispatchEvent(new Event("input")); });
+  shiftInput.addEventListener("input", () => {
+    shiftInput.classList.remove("invalid");
+    if (validateShift(Number(shiftInput.value)) === "" && shiftInput.value !== "") $("shift-range").value = shiftInput.value;
+    if (currentCiphertext !== "" && plaintextBox.value !== "" && validateShift(Number(shiftInput.value)) === "") handleEncrypt();
+  });
+}
+
+if (typeof module !== "undefined") module.exports = { caesarCipher, encryptText, decryptText, validateShift };
+
+</script>
+</body>
+</html>

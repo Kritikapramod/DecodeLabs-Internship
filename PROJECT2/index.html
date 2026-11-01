@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Encryption &amp; Decryption | DecodeLabs Project 02</title>
+  <!-- Optional web font. If it cannot load, style.css falls back to system fonts. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <!-- Relative path: style.css must sit in the SAME folder as this file -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Safety net: shown only if style.css or script.js failed to load (styled inline so it works without CSS) -->
+  <div id="load-warning" hidden style="background:#fde68a;color:#1f2937;padding:14px 20px;font:600 15px Arial,sans-serif;text-align:center">
+    style.css or script.js did not load. Extract the whole ZIP first (right-click, Extract All), then open index.html from the extracted folder.
+  </div>
+  <script>
+    window.addEventListener("load", function () {
+      var cssLoaded = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() !== "";
+      if (!cssLoaded || typeof caesarCipher === "undefined") document.getElementById("load-warning").hidden = false;
+    });
+  </script>
+
+  <header class="nav">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"/></svg>
+      <span class="brand-name">DecodeLabs</span>
+      <span class="brand-label">CYBER SECURITY</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-note">CLASSICAL CIPHER</span>
+      <span class="badge">PROJECT 02</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <p class="eyebrow">CYBERSECURITY LAB / PROJECT 02</p>
+      <h1>Encryption &amp; Decryption</h1>
+      <span class="accent-line" aria-hidden="true"></span>
+      <p class="hero-text">Explore classical cryptography by encrypting and decrypting messages with a configurable Caesar cipher.</p>
+    </section>
+
+    <section class="card workspace" aria-labelledby="workspace-title">
+      <div class="card-header">
+        <h2 id="workspace-title" class="section-label">CIPHER WORKSPACE</h2>
+        <p>Write a message, choose a shift, then encrypt it and decrypt it again.</p>
+      </div>
+
+      <div class="workspace-grid">
+        <!-- LEFT: input and controls -->
+        <div class="panel">
+          <div class="field">
+            <label for="plaintext" class="field-label">YOUR MESSAGE</label>
+            <textarea id="plaintext" rows="6" placeholder="Enter the message you want to encrypt..."></textarea>
+            <div class="field-footer">
+              <span id="char-count" class="muted">0 characters</span>
+              <span class="button-row">
+                <button type="button" id="example-btn" class="btn ghost small">Insert Example</button>
+                <button type="button" id="clear-btn" class="btn ghost small">Clear Input</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="shift" class="field-label">CAESAR SHIFT</label>
+            <div class="shift-row">
+              <input id="shift-range" type="range" min="1" max="25" step="1" value="3" aria-label="Shift slider">
+              <input id="shift" type="number" min="1" max="25" step="1" value="3" inputmode="numeric" aria-describedby="shift-help">
+            </div>
+            <p id="shift-help" class="muted">Each letter moves this many places along the alphabet. With a shift of 3, A becomes D and Z wraps around to C.</p>
+          </div>
+
+          <div class="button-row actions">
+            <button type="button" id="encrypt-btn" class="btn primary">Encrypt Message</button>
+            <button type="button" id="decrypt-btn" class="btn secondary">Decrypt Message</button>
+            <button type="button" id="reset-btn" class="btn ghost">Reset</button>
+          </div>
+          <p id="status" class="status" role="status" aria-live="polite"></p>
+        </div>
+
+        <!-- RIGHT: results -->
+        <div class="panel results">
+          <article class="result-card" id="cipher-card">
+            <div class="result-head">
+              <h3 class="section-label">ENCRYPTED MESSAGE</h3>
+              <span class="state-group"><span id="encrypt-shift" class="tag"></span><span id="encrypt-state" class="state">Waiting</span></span>
+            </div>
+            <div id="ciphertext" class="output placeholder" tabindex="0" aria-label="Encrypted message">Your ciphertext will appear here after encryption.</div>
+            <button type="button" id="copy-cipher-btn" class="btn ghost small" disabled>Copy Ciphertext</button>
+          </article>
+
+          <article class="result-card" id="plain-card">
+            <div class="result-head">
+              <h3 class="section-label">DECRYPTED MESSAGE</h3>
+              <span class="state-group"><span id="decrypt-shift" class="tag"></span><span id="decrypt-state" class="state">Waiting</span></span>
+            </div>
+            <div id="decrypted" class="output placeholder" tabindex="0" aria-label="Decrypted message">The recovered message will appear here after decryption.</div>
+            <button type="button" id="copy-decrypted-btn" class="btn ghost small" disabled>Copy Decrypted Text</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="learn-title">
+      <h2 id="learn-title" class="section-label learn-title">HOW IT WORKS</h2>
+      <div class="learn-grid">
+        <article class="card learn-card"><h3>ENCRYPTION</h3><p>Encryption transforms readable plaintext into unreadable ciphertext using a defined algorithm and a key.</p></article>
+        <article class="card learn-card"><h3>DECRYPTION</h3><p>Decryption reverses the transformation, recovering the plaintext when the correct key is supplied.</p></article>
+        <article class="card learn-card"><h3>THE CAESAR CIPHER</h3><p>Each letter moves a set number of positions through the alphabet, wrapping from Z back to A. Other characters stay unchanged.</p></article>
+      </div>
+    </section>
+
+    <p class="notice"><strong>Educational use only.</strong> The Caesar cipher is intended for educational purposes. It is not secure enough to protect real confidential information.</p>
+  </main>
+
+  <footer class="footer">DecodeLabs · Cyber Security · Project 02</footer>
+  <script src="script.js"></script>
+</body>
+</html>
