@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Password Strength Checker | DecodeLabs</title>
+  <!-- RELATIVE paths: the stylesheet loads whether served by app.py or opened from disk -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="file-warning" class="warning" hidden role="alert">
+    You opened this file directly. Styling works, but checking needs the Python server:
+    run <code>python app.py</code> and open <code>http://127.0.0.1:8000</code>.
+  </div>
+
+  <header class="nav">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Zm-1 14-3-3 1.4-1.4L11 13.2l4.6-4.6L17 10l-6 6Z"/></svg>
+      <span class="brand-name">DecodeLabs</span>
+      <span class="divider"></span>
+      <span class="brand-sub">Cyber Security</span>
+    </div>
+    <span class="pill">Project 01</span>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <span class="badge">PASSWORD SECURITY TOOL</span>
+      <h1>Password Strength Checker</h1>
+      <p>Evaluate password strength locally and learn how to build stronger credentials.</p>
+    </section>
+
+    <section class="card checker" aria-labelledby="checker-title">
+      <h2 id="checker-title" class="visually-hidden">Check a password</h2>
+      <label for="pw">Enter your password</label>
+      <div class="field">
+        <input id="pw" type="password" autocomplete="off" spellcheck="false" maxlength="256" placeholder="Type a password to evaluate">
+        <button id="toggle" type="button" class="btn ghost small" aria-pressed="false" aria-label="Show password">Show</button>
+      </div>
+      <div class="actions">
+        <button id="check" type="button" class="btn primary">Check Strength</button>
+        <button id="clear" type="button" class="btn ghost">Clear</button>
+      </div>
+
+      <div id="result" aria-live="polite" hidden>
+        <div class="result-head">
+          <span>Strength</span>
+          <span id="label" class="result-badge"></span>
+        </div>
+        <div class="meter" role="progressbar" aria-label="Strength score" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0">
+          <div id="bar"></div>
+        </div>
+        <p id="score" class="muted"></p>
+
+        <h3>Requirements</h3>
+        <ul id="checklist" class="checklist"></ul>
+
+        <h3>How to improve</h3>
+        <ul id="tips" class="tips"></ul>
+      </div>
+    </section>
+
+    <section class="card info" aria-labelledby="why-title">
+      <h2 id="why-title">Why length and variety matter</h2>
+      <div class="info-grid">
+        <article><h3>Length</h3><p>Every extra character multiplies the number of possible passwords, so longer passwords are generally much harder to guess.</p></article>
+        <article><h3>Variety</h3><p>Mixing uppercase letters, numbers and symbols enlarges the pool of characters an attacker must try for each position.</p></article>
+        <article><h3>Predictability</h3><p>Attackers try common passwords and patterns like <code>abc</code>, <code>123</code> or <code>aaa</code> first, so predictable choices are risky.</p></article>
+      </div>
+      <p class="muted">This is an educational estimator, not a guarantee of security. Use a unique password per site and a password manager.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <strong>DecodeLabs | Cyber Security Project 01</strong>
+    <span class="muted">Privacy: this tool does not intentionally store or log passwords. They are checked on your own computer and never sent to external services.</span>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
